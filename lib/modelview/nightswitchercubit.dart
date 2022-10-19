@@ -27,12 +27,12 @@ class NightSwitcherState {
   );
 
   final Color _textDefaultDark = const Color(0xffEEEEEE);
-  final Color _textColorDark = Colors.yellow;
+  final Color _textColorDark = const Color(0xfffaebd7);
   final Color _containerDark = const Color(0xffDDDDDD);
 
-  final Color _textInContainerDark = const Color(0xffEEEEEE);
+  final Color _textInContainerDark = const Color(0xffeee9e9);
   final Color _containerTextDark = const Color(0xFF253341);
-  final Color _containerTextColorDark = Colors.yellow;
+  final Color _containerTextColorDark = const Color(0xFFfaebd7);
 
 
   final Color _textDefaultLight = const Color(0xFF253341);
