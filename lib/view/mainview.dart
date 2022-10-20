@@ -42,8 +42,8 @@ class MainView extends StatelessWidget {
                 ),
                 Expanded(
                   child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 10),
-                    child: const DisciplinesList(),
+                    margin: const EdgeInsets.symmetric(vertical: 20),
+                    child: DisciplinesList(),
                   ),
                 ),
                 Container(
@@ -81,7 +81,7 @@ class SearchField extends StatelessWidget {
             label: Text(
               "Search discipline",
               style: TextStyle(
-                color: state.textColor
+                color: state.textDefault
               )
             )
           ),
@@ -105,7 +105,7 @@ class AddForm extends StatelessWidget {
          child: Row(
           children: [
             Icon(Icons.add, color: state.textColor, size: 25),
-            Text("Add Discipline", style: TextStyle(color: state.textColor, fontSize: 20))
+            Text("Add Discipline", style: TextStyle(color: state.textDefault, fontSize: 20))
           ],
          ),
         );
@@ -114,7 +114,107 @@ class AddForm extends StatelessWidget {
   }
 }
 class DisciplinesList extends StatelessWidget {
-  const DisciplinesList({super.key});
+  DisciplinesList({super.key});
+
+  final disciplineController = TextEditingController();
+  final disciplineFocusNode = FocusNode();
+
+  bottomSheetAdd({required BuildContext context}) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+
+    Scaffold.of(context).showBottomSheet<void>(
+      elevation: 10.0,
+      backgroundColor: Colors.transparent,
+          (_) {
+        return BlocBuilder<NightSwitcherCubit, NightSwitcherState>(
+          builder: (context, state) {
+            return Container(
+              height: height * 0.6,
+              decoration: BoxDecoration(
+                color: state.container,
+                borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Text(
+                          "Adding Disciplines",
+                          style: TextStyle(
+                            color: state.textInContainer,
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold
+                          )
+                        ),
+                      )
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.symmetric(horizontal: BorderSide(color: state.textInContainer))
+                      ),
+                      margin: const EdgeInsets.symmetric(horizontal: 10),
+                      padding: const EdgeInsets.only(top: 10),
+                      height: height  * 0.1,
+                      child: TextField(
+                        focusNode: disciplineFocusNode,
+                        controller: disciplineController,
+                        onTapOutside: (event) => disciplineFocusNode.unfocus(),
+                        keyboardType: TextInputType.multiline,
+                        maxLines: null,
+                        cursorColor: state.textInContainer,
+                        style: TextStyle(
+                          color: state.textInContainer,
+                        ),
+                        decoration: InputDecoration(
+                          focusedBorder: const OutlineInputBorder(borderSide: BorderSide.none),
+                          enabledBorder: const OutlineInputBorder(borderSide: BorderSide.none),
+                          label: Text(
+                            "Discipline",
+                            style: TextStyle(
+                              color: state.textInContainer
+                            )
+                          )
+                        ),
+                      )
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Container(
+                        width: width * 0.2,
+                        margin: const EdgeInsets.only(right: 20),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withAlpha(50),
+                          borderRadius: BorderRadius.circular(20)
+                        ),
+                        child: TextButton(
+                          onPressed: () {
+
+                          },
+                          child: const Text(
+                            "Add",
+                            style: TextStyle(
+                              color: Color(0xFFE4CFA9),
+                              fontWeight: FontWeight.bold
+                            )
+                          )
+                        )
+                      )
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
 
   @override
   Widget build(context) {
@@ -128,13 +228,43 @@ class DisciplinesList extends StatelessWidget {
           itemCount: 1,
           itemBuilder: (context, index) {
             return Container(
-              width: width * .6,
               height: height * .1,
               margin: const EdgeInsets.only(bottom: 20, right: 20, left: 20),
               decoration: BoxDecoration(
-                color: nightSwitcherState.containerTextColor,
+                color: nightSwitcherState.container,
                 borderRadius: BorderRadius.circular(40)
               ),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: width * .2,
+                    child: Icon(Icons.numbers, color: nightSwitcherState.textInContainer),
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        "Math",
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: nightSwitcherState.textInContainer
+                        )
+                      ),
+                    )
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      bottomSheetAdd(context: context);
+                    },
+                    icon: Icon(Icons.mode, color: nightSwitcherState.textInContainer),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      //
+                    },
+                    icon: Icon(Icons.arrow_forward, color: nightSwitcherState.textInContainer),
+                  )
+                ],
+              )
             );
           },
         );
