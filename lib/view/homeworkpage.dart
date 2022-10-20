@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:homeworkbloc/modelview/nightswitchercubit.dart';
 import 'mainview.dart';
+import 'package:homeworkbloc/modelview/discipline/disciplinesbloc.dart';
 
 class HomeworkPage extends StatelessWidget {
   const HomeworkPage({super.key});
@@ -15,6 +16,9 @@ class HomeworkPage extends StatelessWidget {
         BlocProvider.value(
           value: BlocProvider.of<NightSwitcherCubit>(context)
         ),
+        BlocProvider<DisciplineBloc>(
+          create: (_) => DisciplineBloc(),
+        )
       ],
       child: const MainView(),
     );
