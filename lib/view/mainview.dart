@@ -1,4 +1,5 @@
 
+import 'devoirsView.dart';
 import 'package:flutter/material.dart';
 import 'package:day_night_switcher/day_night_switcher.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,13 +8,20 @@ import 'package:homeworkbloc/modelview/discipline/discipline.dart';
 import 'package:homeworkbloc/modelview/discipline/disciplinesbloc.dart';
 
 class MainView extends StatelessWidget {
-  const MainView({super.key});
+  MainView({super.key});
+
+  bool isInit = false;
 
   @override
   Widget build(context) {
 
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
+
+    if(!isInit) {
+      BlocProvider.of<DisciplineBloc>(context).add(InitDisciplinesEvent());
+      isInit = true;
+    }
 
     return BlocBuilder<NightSwitcherCubit, NightSwitcherState>(
       builder: (context, nightSwitcherState) {
@@ -200,24 +208,28 @@ class AddForm extends StatelessWidget {
                           color: state.containerText,
                           borderRadius: BorderRadius.circular(20)
                         ),
-                        child: TextButton(
-                          onPressed: () {
-                            String name = disciplineController.text.replaceAll("'", "''");
-                            String semester = semesterController.text.replaceAll("'", "''");
+                        child: BlocBuilder<DisciplineBloc, DisciplineState>(
+                          builder: (context, disciplineState) {
+                            return TextButton(
+                              onPressed: () {
+                                String name = disciplineController.text.replaceAll("'", "''");
+                                String semester = semesterController.text.replaceAll("'", "''");
 
-                            if(name.isNotEmpty && regexSemester.hasMatch(semester)) {
-                              Discipline newDiscipline = Discipline(name: name, semester: semester);
-                              BlocProvider.of<DisciplineBloc>(context).add(AddDisciplineEvent(discipline: newDiscipline));
-                              Navigator.pop(context);
-                            }
+                                if(name.isNotEmpty && regexSemester.hasMatch(semester) && disciplineState.disciplines.indexWhere((element) => element.name == name) == -1) {
+                                  Discipline newDiscipline = Discipline(name: name, semester: semester);
+                                  BlocProvider.of<DisciplineBloc>(context).add(AddDisciplineEvent(discipline: newDiscipline));
+                                  Navigator.pop(context);
+                                }
+                              },
+                              child: Text(
+                                "Add",
+                                style: TextStyle(
+                                  color: state.textDefault,
+                                  fontWeight: FontWeight.bold
+                                )
+                              )
+                            );
                           },
-                          child: Text(
-                            "Add",
-                            style: TextStyle(
-                              color: state.textDefault,
-                              fontWeight: FontWeight.bold
-                            )
-                          )
                         )
                       )
                     )
@@ -380,6 +392,14 @@ class DisciplinesList extends StatelessWidget {
                           ),
                           child: TextButton(
                             onPressed: () {
+                              String newName = disciplineController.text;
+                              String newSemester = semesterController.text;
+
+                              if(newName != discipline.name || newSemester != discipline.semester) {
+                                discipline.name = newName;
+                                discipline.semester = newSemester;
+                                BlocProvider.of<DisciplineBloc>(context).add(ModifyNoteEvent(discipline: discipline));
+                              }
                               Navigator.pop(context);
                             },
                             child: Text(
@@ -410,7 +430,6 @@ class DisciplinesList extends StatelessWidget {
 
     return BlocBuilder<NightSwitcherCubit, NightSwitcherState>(
       builder: (context, nightSwitcherState) {
-        BlocProvider.of<DisciplineBloc>(context).add(InitDisciplinesEvent());
         return BlocBuilder<DisciplineBloc, DisciplineState>(
           builder: (context, disciplinesState) {
             List<Discipline> disciplines = disciplinesState.disciplines;
@@ -451,6 +470,9 @@ class DisciplinesList extends StatelessWidget {
                         width: width * 0.2,
                         child: IconButton(
                           onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(
+                              builder: (_) => MultiBlocProvider
+                            ));
                           },
                           icon: Icon(Icons.arrow_forward, color: nightSwitcherState.textInContainer),
                         ),

@@ -1,8 +1,8 @@
 
 class Discipline {
   int? id;
-  final String name;
-  final String semester;
+  String name;
+  String semester;
 
   Discipline({this.id, required this.name, required this.semester});
 

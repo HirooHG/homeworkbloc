@@ -20,7 +20,7 @@ class HomeworkPage extends StatelessWidget {
           create: (_) => DisciplineBloc(),
         )
       ],
-      child: const MainView(),
+      child: MainView(),
     );
   }
 }

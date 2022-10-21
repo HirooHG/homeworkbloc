@@ -55,13 +55,12 @@ class AddedDisciplineState extends DisciplineState {
   AddedDisciplineState({required super.disciplines});
 
   add(Discipline discipline) async {
-    if(disciplines.indexWhere((element) => element.name == discipline.name) == -1) {
-      disciplines.add(discipline);
-      await handler.execQuery(
-          "insert into discipline (name, semester) values ('${discipline.name}', '${discipline.semester}');"
-      );
-      discipline.id = (await handler.rawQuery("select iddiscipline from discipline where name = '${discipline.name}';"))[0]["iddiscipline"] as int;
-    }
+    disciplines.add(discipline);
+
+    await handler.execQuery(
+        "insert into discipline (name, semester) values ('${discipline.name}', '${discipline.semester}');"
+    );
+    discipline.id = (await handler.rawQuery("select iddiscipline from discipline where name = '${discipline.name}';"))[0]["iddiscipline"] as int;
   }
 }
 class ModifiedDisciplineState extends DisciplineState {
@@ -69,8 +68,8 @@ class ModifiedDisciplineState extends DisciplineState {
 
   modify(Discipline discipline) async {
     await handler.execQuery(
-      "update discipline set name = ${discipline.name},"
-          " semester = ${discipline.semester} where iddiscipline = ${discipline.id};"
+      "update discipline set name = '${discipline.name}',"
+          " semester = '${discipline.semester}' where iddiscipline = ${discipline.id};"
     );
   }
 }
