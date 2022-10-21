@@ -21,7 +21,7 @@ class NightSwitcherState {
   final ThemeData dark = ThemeData.dark().copyWith(
     appBarTheme: const AppBarTheme(
       color: Color(0xFF253341),
-      foregroundColor: Colors.yellow
+      foregroundColor: Color(0xffDDDDDD)
     ),
     scaffoldBackgroundColor: const Color(0xFF15202B),
   );

@@ -1,5 +1,5 @@
 
-import 'devoirsView.dart';
+import 'HomeworksView.dart';
 import 'package:flutter/material.dart';
 import 'package:day_night_switcher/day_night_switcher.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -171,6 +171,9 @@ class AddForm extends StatelessWidget {
                             )
                           )
                         ),
+                        onSubmitted: (value) {
+                          semesterFocusNode.requestFocus();
+                        },
                       )
                     ),
                     Container(
@@ -471,7 +474,17 @@ class DisciplinesList extends StatelessWidget {
                         child: IconButton(
                           onPressed: () {
                             Navigator.push(context, MaterialPageRoute(
-                              builder: (_) => MultiBlocProvider
+                              builder: (_) => MultiBlocProvider(
+                                providers: [
+                                  BlocProvider.value(
+                                    value: BlocProvider.of<DisciplineBloc>(context)
+                                  ),
+                                  BlocProvider.value(
+                                    value: BlocProvider.of<NightSwitcherCubit>(context)
+                                  )
+                                ],
+                                child: HomeworkView(discipline: discipline),
+                              )
                             ));
                           },
                           icon: Icon(Icons.arrow_forward, color: nightSwitcherState.textInContainer),

@@ -1,35 +1,35 @@
 
 import 'package:bloc/bloc.dart';
-import 'discipline.dart';
+import 'homework.dart';
 import 'package:homeworkbloc/model/databasehandler.dart';
 
-class DisciplineEvent {
-  const DisciplineEvent();
+class HomeworkEvent {
+  const HomeworkEvent();
 }
-class InitDisciplinesEvent extends DisciplineEvent {
+class InitHomeworkEvent extends HomeworkEvent {
 
 }
-class RemoveDisciplineEvent extends DisciplineEvent {
-  const RemoveDisciplineEvent({required this.discipline});
+class RemoveHomeworkEvent extends HomeworkEvent {
+  const RemoveHomeworkEvent({required this.homework});
 
-  final Discipline discipline;
+  final Homework homework;
 }
-class AddDisciplineEvent extends DisciplineEvent {
-  const AddDisciplineEvent({required this.discipline});
+class AddHomeworkEvent extends HomeworkEvent {
+  const AddHomeworkEvent({required this.homework});
 
-  final Discipline discipline;
+  final Homework homework;
 }
-class ModifyNoteEvent extends DisciplineEvent {
-  const ModifyNoteEvent({required this.discipline});
+class ModifyHomeworkEvent extends HomeworkEvent {
+  const ModifyHomeworkEvent({required this.homework});
 
-  final Discipline discipline;
+  final Homework homework;
 }
 
-class DisciplineState {
-  final List<Discipline> disciplines;
+class HomeworkState {
+  final List<Homework> homeworks;
   final handler = DatabaseHandler();
 
-  DisciplineState({required this.disciplines});
+  HomeworkState({required this.homeworks});
 }
 class InitDisciplinesState extends DisciplineState {
   InitDisciplinesState({required super.disciplines});
@@ -70,8 +70,8 @@ class ModifiedDisciplineState extends DisciplineState {
 
   modify(Discipline discipline) async {
     await handler.execQuery(
-      "update discipline set name = '${discipline.name}',"
-          " semester = '${discipline.semester}' where iddiscipline = ${discipline.id};"
+        "update discipline set name = '${discipline.name}',"
+            " semester = '${discipline.semester}' where iddiscipline = ${discipline.id};"
     );
   }
 }
