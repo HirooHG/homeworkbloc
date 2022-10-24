@@ -1,7 +1,9 @@
 
 import 'package:bloc/bloc.dart';
+
 import 'homework.dart';
 import 'package:homeworkbloc/model/databasehandler.dart';
+import '../discipline/discipline.dart';
 
 class HomeworkEvent {
   const HomeworkEvent();
@@ -24,84 +26,101 @@ class ModifyHomeworkEvent extends HomeworkEvent {
 
   final Homework homework;
 }
+class ChangeDisciplineEvent extends HomeworkEvent {
+  const ChangeDisciplineEvent({required this.discipline});
+
+  final Discipline discipline;
+}
 
 class HomeworkState {
-  final List<Homework> homeworks;
+  List<Homework> homeworks;
+  final List<Homework> allHomeworks;
+  Discipline discipline;
   final handler = DatabaseHandler();
 
-  HomeworkState({required this.homeworks});
+  HomeworkState({required this.homeworks, required this.discipline, required this.allHomeworks});
 }
-class InitDisciplinesState extends DisciplineState {
-  InitDisciplinesState({required super.disciplines});
+class InitHomeworkState extends HomeworkState {
+  InitHomeworkState({required super.homeworks, required super.discipline, required super.allHomeworks});
 
   init() async {
-    var list = await handler.rawQuery("select * from discipline;");
+    var list = await handler.rawQuery("select * from homework;");
 
     for(var i in list) {
-      Discipline discipline = Discipline.fromBdd(map: i);
-      if(!disciplines.any((element) => element.id == discipline.id)) {
-        disciplines.add(discipline);
+      Homework homework = Homework.fromBdd(map: i);
+      if(!homeworks.any((element) => element.id == homework.id)) {
+        if(homework.iddiscipline == discipline.id) homeworks.add(homework);
+        allHomeworks.add(homework);
       }
     }
   }
 }
-class RemovedDisciplineState extends DisciplineState {
-  RemovedDisciplineState({required super.disciplines});
+class RemovedHomeworkState extends HomeworkState {
+  RemovedHomeworkState({required super.homeworks, required super.discipline, required super.allHomeworks});
 
-  remove(Discipline discipline) async {
-    await handler.execQuery("delete from discipline where iddiscipline = ${discipline.id}");
-    disciplines.remove(discipline);
+  remove(Homework homework) async {
+    await handler.execQuery("delete from homework where idhomework = ${homework.id}");
+    homeworks.remove(homework);
+    allHomeworks.remove(homework);
   }
 }
-class AddedDisciplineState extends DisciplineState {
-  AddedDisciplineState({required super.disciplines});
+class AddedHomeworkState extends HomeworkState {
+  AddedHomeworkState({required super.homeworks, required super.allHomeworks, required super.discipline});
 
-  add(Discipline discipline) async {
-    disciplines.add(discipline);
+  add(Homework homework) async {
+    homeworks.add(homework);
+    allHomeworks.add(homework);
 
     await handler.execQuery(
-        "insert into discipline (name, semester) values ('${discipline.name}', '${discipline.semester}');"
+        "insert into homework (note, day, week, iddiscipline) "
+          "values ('${homework.note}', '${homework.day}', ${homework.week}, ${discipline.id});"
     );
-    discipline.id = (await handler.rawQuery("select iddiscipline from discipline where name = '${discipline.name}';"))[0]["iddiscipline"] as int;
+    homework.id = (await handler.rawQuery("select idhomework from homework "
+        " where note = '${homework.note}'"
+        " and day ='${homework.day}'"
+        " and week = ${homework.week};"))[0]["idhomework"] as int;
   }
 }
-class ModifiedDisciplineState extends DisciplineState {
-  ModifiedDisciplineState({required super.disciplines});
+class ModifiedHomeworkState extends HomeworkState {
+  ModifiedHomeworkState({required super.homeworks, required super.discipline, required super.allHomeworks});
 
-  modify(Discipline discipline) async {
+  modify(Homework homework) async {
     await handler.execQuery(
-        "update discipline set name = '${discipline.name}',"
-            " semester = '${discipline.semester}' where iddiscipline = ${discipline.id};"
+        "update homework set note = '${homework.note}',"
+          " day = '${homework.day}' where idhomework = ${homework.id};"
     );
   }
 }
 
-class DisciplineBloc extends Bloc<DisciplineEvent, DisciplineState> {
-  DisciplineBloc() : super(InitDisciplinesState(disciplines: [ ])) {
-    on<DisciplineEvent>(onEventDiscipline);
+class HomeworkBloc extends Bloc<HomeworkEvent, HomeworkState> {
+  HomeworkBloc({required Discipline discipline}) : super(InitHomeworkState(homeworks: [ ], allHomeworks: [], discipline: discipline)) {
+    on<HomeworkEvent>(onEventDiscipline);
   }
 
-  onEventDiscipline(DisciplineEvent event, Emitter<DisciplineState> emit) {
+  onEventDiscipline(HomeworkEvent event, Emitter<HomeworkState> emit) async {
     switch(event.runtimeType) {
-      case InitDisciplinesEvent:
-        InitDisciplinesState nextState = InitDisciplinesState(disciplines: state.disciplines);
-        nextState.init();
+      case InitHomeworkEvent:
+        InitHomeworkState nextState = InitHomeworkState(homeworks: state.homeworks, allHomeworks: state.allHomeworks, discipline: state.discipline);
+        await nextState.init();
         emit(nextState);
         break;
-      case RemoveDisciplineEvent:
-        RemovedDisciplineState nextState = RemovedDisciplineState(disciplines: state.disciplines);
-        nextState.remove((event as RemoveDisciplineEvent).discipline);
+      case RemoveHomeworkEvent:
+        RemovedHomeworkState nextState = RemovedHomeworkState(homeworks: state.homeworks, allHomeworks: state.allHomeworks, discipline: state.discipline);
+        nextState.remove((event as RemoveHomeworkEvent).homework);
         emit(nextState);
         break;
-      case AddDisciplineEvent:
-        AddedDisciplineState nextState = AddedDisciplineState(disciplines: state.disciplines);
-        nextState.add((event as AddDisciplineEvent).discipline);
+      case AddHomeworkEvent:
+        AddedHomeworkState nextState = AddedHomeworkState(homeworks: state.homeworks, allHomeworks: state.allHomeworks, discipline: state.discipline);
+        nextState.add((event as AddHomeworkEvent).homework);
         emit(nextState);
         break;
-      case ModifyNoteEvent:
-        ModifiedDisciplineState nextState = ModifiedDisciplineState(disciplines: state.disciplines);
-        nextState.modify((event as ModifyNoteEvent).discipline);
+      case ModifyHomeworkEvent:
+        ModifiedHomeworkState nextState = ModifiedHomeworkState(homeworks: state.homeworks, allHomeworks: state.allHomeworks, discipline: state.discipline);
+        nextState.modify((event as ModifyHomeworkEvent).homework);
         emit(nextState);
+        break;
+      case ChangeDisciplineEvent:
+
         break;
     }
   }

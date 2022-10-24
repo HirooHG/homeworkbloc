@@ -50,6 +50,7 @@ class RemovedDisciplineState extends DisciplineState {
 
   remove(Discipline discipline) async {
     await handler.execQuery("delete from discipline where iddiscipline = ${discipline.id}");
+    await handler.execQuery("delete from homework where iddiscipline = ${discipline.id}");
     disciplines.remove(discipline);
   }
 }
@@ -81,11 +82,11 @@ class DisciplineBloc extends Bloc<DisciplineEvent, DisciplineState> {
     on<DisciplineEvent>(onEventDiscipline);
   }
 
-  onEventDiscipline(DisciplineEvent event, Emitter<DisciplineState> emit) {
+  onEventDiscipline(DisciplineEvent event, Emitter<DisciplineState> emit) async {
     switch(event.runtimeType) {
       case InitDisciplinesEvent:
         InitDisciplinesState nextState = InitDisciplinesState(disciplines: state.disciplines);
-        nextState.init();
+        await nextState.init();
         emit(nextState);
         break;
       case RemoveDisciplineEvent:
