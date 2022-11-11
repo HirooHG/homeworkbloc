@@ -11,17 +11,12 @@ import 'homeworksview.dart';
 class DisciplinesView extends StatelessWidget {
   DisciplinesView({super.key});
 
-  bool isInit = false;
 
   @override
   Widget build(context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
 
-    if(!isInit) {
-      BlocProvider.of<DisciplineBloc>(context).add(InitDisciplinesEvent());
-      isInit = true;
-    }
     return BlocBuilder<NightSwitcherCubit, NightSwitcherState>(
       builder: (context, nightSwitcherState) {
         return Container(
@@ -68,14 +63,14 @@ class SearchField extends StatelessWidget {
           controller: searchDisciplineController,
           cursorColor: state.textColor,
           decoration: InputDecoration(
-              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: state.textDefault, width: 2.0)),
-              enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: state.textDefault, width: 2.0)),
-              label: Text(
-                  "Search discipline",
-                  style: TextStyle(
-                      color: state.textDefault
-                  )
+            focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: state.textDefault, width: 2.0)),
+            enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: state.textDefault, width: 2.0)),
+            label: Text(
+              "Search discipline",
+              style: TextStyle(
+                color: state.textDefault
               )
+            )
           ),
           onSubmitted: (value) {
           },
@@ -272,26 +267,26 @@ class DisciplinesList extends StatelessWidget {
             return Container(
               height: height * 0.6,
               decoration: BoxDecoration(
-                  color: state.container,
-                  borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+                color: state.container,
+                borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
               ),
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
                     Align(
-                        alignment: Alignment.centerLeft,
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: Text(
-                              "Modifying Disciplines",
-                              style: TextStyle(
-                                  color: state.textInContainer,
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold
-                              )
-                          ),
-                        )
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Text(
+                          "Modifying Disciplines",
+                          style: TextStyle(
+                            color: state.textInContainer,
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold
+                          )
+                        ),
+                      )
                     ),
                     Container(
                         decoration: BoxDecoration(
@@ -424,60 +419,60 @@ class DisciplinesList extends StatelessWidget {
               itemBuilder: (context, index) {
                 Discipline discipline = disciplines[index];
                 return Container(
-                    height: height * .1,
-                    margin: const EdgeInsets.only(bottom: 20, right: 20, left: 20),
-                    decoration: BoxDecoration(
-                        color: nightSwitcherState.container,
-                        borderRadius: BorderRadius.circular(40)
-                    ),
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: width * 0.2,
-                          child: IconButton(
-                            onPressed: () {
-                              bottomSheetModify(context: context, discipline: discipline);
-                            },
-                            icon: Icon(Icons.mode, color: nightSwitcherState.textInContainer),
-                          ),
+                  height: height * .1,
+                  margin: const EdgeInsets.only(bottom: 20, right: 20, left: 20),
+                  decoration: BoxDecoration(
+                    color: nightSwitcherState.container,
+                    borderRadius: BorderRadius.circular(40)
+                  ),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: width * 0.2,
+                        child: IconButton(
+                          onPressed: () {
+                            bottomSheetModify(context: context, discipline: discipline);
+                          },
+                          icon: Icon(Icons.mode, color: nightSwitcherState.textInContainer),
                         ),
-                        Expanded(
-                            child: Center(
-                              child: Text(
-                                  discipline.name,
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      color: nightSwitcherState.textInContainer
-                                  )
-                              ),
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            discipline.name,
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: nightSwitcherState.textInContainer
                             )
-                        ),
-                        SizedBox(
-                          width: width * 0.2,
-                          child: IconButton(
-                            onPressed: () {
-                              Navigator.push(context, MaterialPageRoute(
-                                  builder: (_) => MultiBlocProvider(
-                                    providers: [
-                                      BlocProvider.value(
-                                          value: BlocProvider.of<DisciplineBloc>(context)
-                                      ),
-                                      BlocProvider.value(
-                                          value: BlocProvider.of<NightSwitcherCubit>(context)
-                                      ),
-                                      BlocProvider<HomeworkBloc>(
-                                          create: (_) => HomeworkBloc(discipline: discipline)
-                                      )
-                                    ],
-                                    child: HomeworkView(discipline: discipline),
-                                  )
-                              ));
-                            },
-                            icon: Icon(Icons.arrow_forward, color: nightSwitcherState.textInContainer),
                           ),
+                        )
+                      ),
+                      SizedBox(
+                        width: width * 0.2,
+                        child: IconButton(
+                          onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(
+                              builder: (_) => MultiBlocProvider(
+                                providers: [
+                                  BlocProvider.value(
+                                    value: BlocProvider.of<DisciplineBloc>(context)
+                                  ),
+                                  BlocProvider.value(
+                                    value: BlocProvider.of<NightSwitcherCubit>(context)
+                                  ),
+                                  BlocProvider.value(
+                                    value: BlocProvider.of<HomeworkBloc>(context),
+                                  )
+                                ],
+                                child: HomeworkView(discipline: discipline),
+                              )
+                            ));
+                          },
+                          icon: Icon(Icons.arrow_forward, color: nightSwitcherState.textInContainer),
                         ),
-                      ],
-                    )
+                      ),
+                    ],
+                  )
                 );
               },
             );

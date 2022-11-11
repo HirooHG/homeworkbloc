@@ -7,9 +7,11 @@ import 'package:homeworkbloc/modelview/nightswitchercubit.dart';
 import 'package:homeworkbloc/modelview/discipline/discipline.dart';
 
 class HomeworkView extends StatelessWidget {
-  const HomeworkView({super.key, required this.discipline});
+  HomeworkView({super.key, required this.discipline});
 
   final Discipline discipline;
+
+  bool isInit = false;
 
   @override
   Widget build(context) {
@@ -17,7 +19,10 @@ class HomeworkView extends StatelessWidget {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
 
-    BlocProvider.of<HomeworkBloc>(context).add(InitHomeworkEvent());
+    if(!isInit) {
+      BlocProvider.of<HomeworkBloc>(context).add(ChangeDisciplineEvent(discipline: discipline));
+      isInit = true;
+    }
 
     return BlocBuilder<NightSwitcherCubit, NightSwitcherState>(
       builder: (context, nightSwitcherState) {

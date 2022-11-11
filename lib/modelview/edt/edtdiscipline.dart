@@ -14,6 +14,13 @@ class EdtDiscipline {
     required this.dateEnd,
     required this.dateStart
   }) {
-    dt = dateEnd - dateEnd;
+    dt = (dateEnd.hour - dateStart.hour);
   }
+
+  EdtDiscipline.empty() :
+      summary = "",
+      location = "",
+      description = "",
+      dateStart = DateTime.now(),
+      dateEnd = DateTime.now();
 }
