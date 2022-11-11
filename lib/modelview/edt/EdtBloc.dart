@@ -8,15 +8,20 @@ import 'package:bloc/bloc.dart';
 import 'edtdiscipline.dart';
 
 abstract class EdtEvent {
-
+  const EdtEvent();
 }
 class InitEvent extends EdtEvent {
 
 }
 class ChangeDay extends EdtEvent {
-  ChangeDay({required this.sens});
+  const ChangeDay({required this.sens});
 
   final bool sens;
+}
+class ChangeDayCalendar extends EdtEvent {
+  const ChangeDayCalendar({required this.day});
+
+  final DateTime day;
 }
 
 abstract class EdtState {
@@ -122,6 +127,17 @@ class ChangedDay extends EdtState {
           && discipline.dateStart.year == today.year).toList();
   }
 }
+class ChangedDayCalendar extends EdtState {
+  ChangedDayCalendar({required super.allEdtDisciplines, required super.currentEdtDiscipline, required super.today});
+
+  change(DateTime day) {
+    today = day;
+    currentEdtDiscipline.clear();
+    currentEdtDiscipline = allEdtDisciplines.where((discipline) => discipline.dateStart.day == today.day
+        &&  discipline.dateStart.month == today.month
+        && discipline.dateStart.year == today.year).toList();
+  }
+}
 
 class EdtBLoc extends Bloc<EdtEvent, EdtState> {
   EdtBLoc() : super(InitState(allEdtDisciplines: [], currentEdtDiscipline: [], today: DateTime.now())) {
@@ -147,6 +163,15 @@ class EdtBLoc extends Bloc<EdtEvent, EdtState> {
         );
         changedDay.change((event as ChangeDay).sens);
         emit(changedDay);
+        break;
+      case ChangeDayCalendar:
+        ChangedDayCalendar changedDayCalendar = ChangedDayCalendar(
+          currentEdtDiscipline: state.currentEdtDiscipline,
+          allEdtDisciplines: state.allEdtDisciplines,
+          today: state.today
+        );
+        changedDayCalendar.change((event as ChangeDayCalendar).day);
+        emit(changedDayCalendar);
         break;
     }
   }

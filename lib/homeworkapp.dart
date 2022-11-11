@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'view/homeworkpage.dart';
-import 'modelview/nightswitchercubit.dart';
+import 'modelview/nightswitcher/nightswitchercubit.dart';
 
 class HomeworkApp extends StatelessWidget {
   const HomeworkApp({super.key});

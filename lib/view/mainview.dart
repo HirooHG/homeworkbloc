@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:day_night_switcher/day_night_switcher.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:homeworkbloc/modelview/nightswitchercubit.dart';
-import 'package:homeworkbloc/modelview/pagemanager.dart';
+import 'package:homeworkbloc/modelview/nightswitcher/nightswitchercubit.dart';
+import 'package:homeworkbloc/modelview/pagemanager/pagemanager.dart';
 import 'package:homeworkbloc/modelview/edt/EdtBloc.dart';
 import 'package:homeworkbloc/modelview/discipline/disciplinesbloc.dart';
 import 'package:homeworkbloc/modelview/homework/homeworksbloc.dart';

@@ -4,9 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:homeworkbloc/modelview/homework/homeworksbloc.dart';
 
 import 'mainview.dart';
-import 'package:homeworkbloc/modelview/nightswitchercubit.dart';
+import 'package:homeworkbloc/modelview/calendarformat/calendarformatcubit.dart';
+import 'package:homeworkbloc/modelview/nightswitcher/nightswitchercubit.dart';
 import 'package:homeworkbloc/modelview/discipline/disciplinesbloc.dart';
-import 'package:homeworkbloc/modelview/pagemanager.dart';
+import 'package:homeworkbloc/modelview/pagemanager/pagemanager.dart';
 import 'package:homeworkbloc/modelview/edt/EdtBloc.dart';
 import 'package:homeworkbloc/modelview/discipline/discipline.dart';
 
@@ -31,6 +32,9 @@ class HomeworkPage extends StatelessWidget {
         ),
         BlocProvider<HomeworkBloc>(
           create: (_) => HomeworkBloc(discipline: Discipline.empty()),
+        ),
+        BlocProvider(
+          create: (_) => CalendarFormatCubit(),
         )
       ],
       child: MainView(),

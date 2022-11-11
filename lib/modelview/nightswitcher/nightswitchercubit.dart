@@ -14,7 +14,7 @@ class NightSwitcherState {
 
   final ThemeData light = ThemeData.light().copyWith(
     appBarTheme: const AppBarTheme(
-      color: Color(0xffEEEEFF),
+      color: Color(0xffFFFFFF),
       foregroundColor: Colors.blue
     ),
   );
