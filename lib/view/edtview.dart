@@ -26,19 +26,25 @@ const discColors = {
   "R3.14": Color(0xff00ff00),
   "S3.01": Color(0xffcccccc),
   "PPP-S": Color(0xffccffcc),
+  "DS": Colors.red
 };
 
 class EdtView extends StatelessWidget {
   EdtView({super.key});
 
-  late double width;
-  late double height;
+  late final double width;
+  late final double height;
   late String today;
+
+  final double ratioH = 0.764;
+  //0.764; with bottombar
+  //0.836 without
+  final int nbDisc = 10;
 
   RegExp discReg = RegExp(r"^([RS][1-3]).([01][1-9])$");
 
   calendarBottom({required BuildContext context, required DateTime todayD}){
-    double width = MediaQuery.of(context).size.width;
+    //double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
 
     showModalBottomSheet<void>(
@@ -107,159 +113,180 @@ class EdtView extends StatelessWidget {
 
               return 0;
             });
-            return Center(
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: height * 0.06,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            BlocProvider.of<EdtBLoc>(context).add(const ChangeDay(sens: false));
-                          },
-                          icon: const Icon(Icons.arrow_back),
+            int heightEdt = (disciplines.isEmpty) ? 10 : disciplines.last.dateEnd.hour - disciplines.first.dateStart.hour;
+
+            return Column(
+              children: [
+                SizedBox(
+                  height: height * 0.06,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          BlocProvider.of<EdtBLoc>(context).add(const ChangeDay(sens: false));
+                        },
+                        icon: const Icon(Icons.arrow_back),
+                      ),
+                      Container (
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        margin: const EdgeInsets.symmetric(vertical: 5),
+                        decoration: BoxDecoration(
+                          color: nightSwitcherState.container,
+                          borderRadius: BorderRadius.circular(8)
                         ),
-                        Container (
-                          padding: const EdgeInsets.symmetric(horizontal: 5),
-                          margin: const EdgeInsets.symmetric(vertical: 5),
-                          decoration: BoxDecoration(
-                            color: nightSwitcherState.container,
-                            borderRadius: BorderRadius.circular(8)
+                        child: TextButton(
+                          onPressed: () {
+                            calendarBottom(context: context, todayD: edtState.today);
+                          },
+                          child: Text(
+                            today,
+                            style: TextStyle(
+                              color: nightSwitcherState.textInContainer,
+                              fontWeight: FontWeight.bold
+                            ),
                           ),
-                          child: TextButton(
-                              onPressed: () {
-                                calendarBottom(context: context, todayD: edtState.today);
-                              },
-                              child: Text(
-                                today,
-                                style: TextStyle(
-                                  color: nightSwitcherState.textInContainer,
-                                  fontWeight: FontWeight.bold
-                                ),
-                              ),
-                            ),
                         ),
-                        IconButton(
-                          onPressed: () {
-                            BlocProvider.of<EdtBLoc>(context).add(const ChangeDay(sens: true));
-                          },
-                          icon: const Icon(Icons.arrow_forward),
-                        )
-                      ],
-                    ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          BlocProvider.of<EdtBLoc>(context).add(const ChangeDay(sens: true));
+                        },
+                        icon: const Icon(Icons.arrow_forward),
+                      )
+                    ],
                   ),
-                  SizedBox(
-                    height: height * 0.764,
-                    width: width,
-                    child: Stack(
-                      children: disciplines.map((e) {
-                        var location = e.location;
-                        var summary = e.summary;
-                        var discR = summary.substring(0, 5);
+                ),
+                SizedBox(
+                  height: (height * ratioH),
+                  child: ListView(
+                    children: [
+                      SizedBox(
+                        height: ((height * ratioH) / nbDisc) * heightEdt,
+                        width: width,
+                        child: SingleChildScrollView(
+                          child: SizedBox(
+                            height: ((height * ratioH) / nbDisc) * heightEdt,
+                            width: width,
+                            child: Stack(
+                              children: disciplines.map((e) {
+                                var location = e.location;
+                                var summary = e.summary;
+                                var discR = summary.substring(0, 5);
 
-                        var listDesc = e.description.split(r"\n");
-                        var name = listDesc[0];
-                        var group = listDesc[2];
-                        var teacher = listDesc[3];
+                                var listDesc = e.description.split(r"\n");
+                                var name = listDesc[0];
+                                var group = listDesc[2];
+                                var teacher = listDesc[3];
 
-                        var contColor = discColors[discR];
-                        contColor ??= const Color(0xffff6666);
-                        print(contColor);
-                        print(discR);
+                                var contColor = discColors[discR];
+                                contColor ??= const Color(0xffff6666);
 
-                        var dt = e.dt;
+                                var dt = e.dt;
 
-                        return Positioned(
-                          top: (((height * 0.764) / 10) * (e.dateStart.hour - 8)),
-                          width: width,
-                          child: Container(
-                            color: contColor,
-                            padding: const EdgeInsets.all(5),
-                            height: ((height * 0.764) / 10) * dt,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Text(
-                                    "${e.dateStart.hour}:${e.dateStart.minute}",
-                                    style: TextStyle(
-                                      color: nightSwitcherState.textInContainer,
-                                      fontSize: 6
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Text(
-                                        teacher,
-                                        style: TextStyle(
-                                          color: nightSwitcherState.textInContainer,
-                                          fontSize: 8
-                                        ),
-                                      ),
-                                      Row(
-                                        children: [
-                                          Container(
-                                            margin: EdgeInsets.symmetric(horizontal: width * 0.1),
-                                            child: Text(
-                                              summary,
-                                              style: TextStyle(
-                                                color: nightSwitcherState.textInContainer,
-                                                fontSize: 14
-                                              ),
-                                              softWrap: false,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.fade,
-                                            )
-                                          ),
-                                          Expanded(
-                                            child: Text(
-                                              location,
-                                              style: TextStyle(
-                                                color: nightSwitcherState.textInContainer,
-                                                fontSize: 14
-                                              ),
-                                              softWrap: false,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.fade,
+                                var ds = summary.split("DS");
+                                var eval = summary.split("éval");
+                                var tpnote = summary.split("tp-noté");
+                                var moodle = summary.split("moodle");
+
+                                if(eval.length >= 2) contColor = discColors["DS"];
+                                if(ds.length >= 2) contColor = discColors["DS"];
+                                if(tpnote.length >= 2) contColor = discColors["DS"];
+                                if(moodle.length >= 2) contColor = discColors["DS"];
+
+                                return Positioned(
+                                  top: (((height * 0.764) / 10) * (e.dateStart.hour - 8)),
+                                  width: width,
+                                  child: Container(
+                                    color: contColor,
+                                    padding: const EdgeInsets.all(5),
+                                    height: ((height * 0.764) / 10) * dt,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Align(
+                                          alignment: Alignment.topLeft,
+                                          child: Text(
+                                            "${e.dateStart.hour}:${e.dateStart.minute}",
+                                            style: TextStyle(
+                                              color: nightSwitcherState.textInContainer,
+                                              fontSize: 6
                                             ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              Text(
+                                                teacher,
+                                                style: TextStyle(
+                                                  color: nightSwitcherState.textInContainer,
+                                                  fontSize: 8
+                                                ),
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Container(
+                                                    margin: EdgeInsets.symmetric(horizontal: width * 0.1),
+                                                    child: Text(
+                                                      summary,
+                                                      style: TextStyle(
+                                                        color: nightSwitcherState.textInContainer,
+                                                        fontSize: 14
+                                                      ),
+                                                      softWrap: false,
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.fade,
+                                                    )
+                                                  ),
+                                                  Expanded(
+                                                    child: Text(
+                                                      location,
+                                                      style: TextStyle(
+                                                        color: nightSwitcherState.textInContainer,
+                                                        fontSize: 14
+                                                      ),
+                                                      softWrap: false,
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.fade,
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                              Text(
+                                                "$name - $group",
+                                                style: TextStyle(
+                                                  color: nightSwitcherState.textInContainer,
+                                                  fontSize: 8
+                                                )
+                                              )
+                                            ],
                                           )
-                                        ],
-                                      ),
-                                      Text(
-                                        "$name - $group",
-                                        style: TextStyle(
-                                          color: nightSwitcherState.textInContainer,
-                                          fontSize: 8
-                                        )
-                                      )
-                                    ],
-                                  )
-                                ),
-                                Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Text(
-                                    "${e.dateEnd.hour}:${e.dateEnd.minute}",
-                                    style: TextStyle(
-                                      color: nightSwitcherState.textInContainer,
-                                      fontSize: 6
+                                        ),
+                                        Align(
+                                          alignment: Alignment.topLeft,
+                                          child: Text(
+                                            "${e.dateEnd.hour}:${e.dateEnd.minute}",
+                                            style: TextStyle(
+                                              color: nightSwitcherState.textInContainer,
+                                              fontSize: 6
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                                  )
+                                );
+                              }).toList(),
+                            )
                           )
-                        );
-                      }).toList(),
-                    )
+                        )
+                      )
+                    ],
                   )
-                ],
-              ),
+                )
+              ],
             );
           }
         );

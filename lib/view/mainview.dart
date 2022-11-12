@@ -51,12 +51,12 @@ class MainView extends StatelessWidget {
                 },
                 items: const [
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.mode),
-                    label: "Discipline"
+                      icon: Icon(Icons.mode),
+                      label: "Discipline"
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.edit_calendar),
-                    label: "Edt"
+                      icon: Icon(Icons.edit_calendar),
+                      label: "Edt"
                   ),
                 ],
               ),
@@ -82,3 +82,5 @@ class MainView extends StatelessWidget {
     );
   }
 }
+/*
+* */
