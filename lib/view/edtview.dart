@@ -32,8 +32,8 @@ const discColors = {
 class EdtView extends StatelessWidget {
   EdtView({super.key});
 
-  late final double width;
-  late final double height;
+  double width = 0;
+  double height = 0;
   late String today;
 
   final double ratioH = 0.764;
@@ -44,8 +44,6 @@ class EdtView extends StatelessWidget {
   RegExp discReg = RegExp(r"^([RS][1-3]).([01][1-9])$");
 
   calendarBottom({required BuildContext context, required DateTime todayD}){
-    //double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
 
     showModalBottomSheet<void>(
       backgroundColor: Colors.transparent,

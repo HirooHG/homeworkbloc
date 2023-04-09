@@ -37,22 +37,52 @@ class InitState extends EdtState {
   init() async {
     var dio = Dio();
     var res = Response(requestOptions: RequestOptions(path: ''));
+    var file = File("/data/user/0/fr.HirooDebug.homeworkbloc/files/edt.ics");
 
+    if(file.existsSync()) {
+      await initExist(res, dio);
+    } else {
+      await initNotExist(dio);
+    }
+  }
+  Future initNotExist(Dio dio) async {
+    Response res = Response(requestOptions: RequestOptions(path: ''));
+
+    try{
+      res = await dio.post(
+          "https://ade-usmb-ro.grenet.fr/jsp/custom/modules/plannings/direct_cal.jsp",
+          queryParameters: {
+            "data": "b5cfb898a9c27be94975c12c6eb30e9233bdfae22c1b52e2cd88eb944acf5364c69e3e5921f4a6ebe36e93ea9658a08f,1",
+            "resources": 2663,
+            "projectId": 4,
+            "calType": "ical",
+            "lastDate": "2042-08-14"
+          }
+      );
+      await File("/data/user/0/fr.HirooDebug.homeworkbloc/files/edt.ics").writeAsString(res.data);
+      final cal = ICalendar.fromString(res.data);
+      initTabs(cal);
+    }catch(e) {
+      final cal = ICalendar(data: [], headData: {});
+      initTabs(cal);
+    }
+  }
+  Future initExist(Response res, Dio dio) async {
     res = await dio.post(
-      "https://ade-usmb-ro.grenet.fr/jsp/custom/modules/plannings/direct_cal.jsp",
-      queryParameters: {
-       "data": "b5cfb898a9c27be94975c12c6eb30e9233bdfae22c1b52e2cd88eb944acf5364c69e3e5921f4a6ebe36e93ea9658a08f,1",
-       "resources": 2663,
-       "projectId": 4,
-       "calType": "ical",
-       "lastDate": "2042-08-14"
-      }
+        "https://ade-usmb-ro.grenet.fr/jsp/custom/modules/plannings/direct_cal.jsp",
+        queryParameters: {
+          "data": "b5cfb898a9c27be94975c12c6eb30e9233bdfae22c1b52e2cd88eb944acf5364c69e3e5921f4a6ebe36e93ea9658a08f,1",
+          "resources": 2663,
+          "projectId": 4,
+          "calType": "ical",
+          "lastDate": "2042-08-14"
+        }
     ).timeout(const Duration(seconds: 5), onTimeout: () async {
       if(kDebugMode) print("timed out");
       res.data = await File("/data/user/0/fr.HirooDebug.homeworkbloc/files/edt.ics").readAsString();
       return res;
     })
-     .onError((error, stackTrace) async {
+        .onError((error, stackTrace) async {
       if(kDebugMode) print(error);
       res.data = await File("/data/user/0/fr.HirooDebug.homeworkbloc/files/edt.ics").readAsString();
       return res;
@@ -62,6 +92,9 @@ class InitState extends EdtState {
 
     final cal = ICalendar.fromString(res.data);
 
+    initTabs(cal);
+  }
+  void initTabs(ICalendar cal) {
     for(var a in cal.data) {
       var dtstart = (a["dtstart"] as IcsDateTime).dt;
       var dtend = (a["dtend"] as IcsDateTime).dt;
@@ -85,16 +118,16 @@ class InitState extends EdtState {
       var dateStart = parseDt(year: yearStart, month: monthStart, day: dayStart, hour: hourStart, minute: minuteStart);
 
       EdtDiscipline discipline = EdtDiscipline(
-        summary: summary,
-        location: location,
-        description: description,
-        dateEnd: dateEnd,
-        dateStart: dateStart
+          summary: summary,
+          location: location,
+          description: description,
+          dateEnd: dateEnd,
+          dateStart: dateStart
       );
       allEdtDisciplines.add(discipline);
       bool c = discipline.dateStart.day == today.day
-              &&  discipline.dateStart.month == today.month
-              && discipline.dateStart.year == today.year;
+          &&  discipline.dateStart.month == today.month
+          && discipline.dateStart.year == today.year;
       bool b = currentEdtDiscipline.any((element) => element.dateStart == discipline.dateStart && element.dateEnd == discipline.dateEnd);
 
       if(c && !b) {
